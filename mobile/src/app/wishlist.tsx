@@ -83,10 +83,9 @@ export default function WishlistScreen() {
               
               {/* Contextual AI Banner */}
               <AIBanner 
-                fitScore={fitScore}
-                badgeColor={item.product?.aiFit?.badgeColor} 
-                consensus={reviewText}
-                isFallback={!item.product?.aiFit?.matchScore}
+                confidenceLevel={item.aiBanner?.confidenceLevel}
+                caveatText={item.aiBanner?.caveatText}
+                isFallback={item.aiBanner?.isFallback || false}
                 onPress={() => setSelectedSku(item.sku)}
               />
             </View>
@@ -104,6 +103,7 @@ export default function WishlistScreen() {
 
       <DecisionDrawer 
         sku={selectedSku} 
+        aiBannerData={wishlistItems.find((i: any) => i.sku === selectedSku)?.aiBanner}
         onClose={() => setSelectedSku(null)} 
         onSuccess={(sku, size, addedCount = 1) => {
           setWishlistItems((prev: any[]) => prev.filter(item => item.sku !== sku));

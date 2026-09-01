@@ -222,12 +222,12 @@ const inventory: any = {
 
 const ugcMedia: any = {
   'SKU1001': [
-    { id: '1', url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=200', username: '@stylebyananya' },
-    { id: '2', url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=200', username: '@fashionista99' }
+    { id: '1', url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=200', username: '@stylebyananya', sizeBought: 'M', reviewText: 'Fits comfortably around the waist. Slightly fitted at the hips.' },
+    { id: '2', url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=200', username: '@fashionista99', sizeBought: 'M', reviewText: 'Comfortable fit. Fabric has some stretch.' }
   ],
   'SKU1002': [
-    { id: '3', url: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200', username: '@rahulstyles' },
-    { id: '4', url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=200', username: '@denimlover' }
+    { id: '3', url: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200', username: '@rahulstyles', sizeBought: '30', reviewText: 'Great quality and perfectly tailored.' },
+    { id: '4', url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=200', username: '@denimlover', sizeBought: '32', reviewText: 'Love the wash, highly recommend.' }
   ]
 };
 

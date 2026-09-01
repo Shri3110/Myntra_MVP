@@ -2,17 +2,17 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface AIBannerProps {
-  fitScore: number | null;
-  consensus: string;
+  confidenceLevel?: 'HIGH' | 'MEDIUM' | 'INSUFFICIENT_DATA';
+  caveatText?: string;
   isFallback: boolean;
-  badgeColor?: string;
   onPress?: () => void;
 }
 
-export const AIBanner: React.FC<AIBannerProps> = ({ fitScore, consensus, isFallback, badgeColor, onPress }) => {
-  const isHighMatch = fitScore && fitScore >= 90;
-  const isModerateMatch = fitScore && fitScore >= 60 && fitScore < 90;
-  const scoreColor = badgeColor || (isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#8a8d9a');
+export const AIBanner: React.FC<AIBannerProps> = ({ confidenceLevel = 'INSUFFICIENT_DATA', caveatText, isFallback, onPress }) => {
+  const isHighMatch = confidenceLevel === 'HIGH';
+  const isModerateMatch = confidenceLevel === 'MEDIUM';
+  const scoreColor = isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#8a8d9a';
+  const badgeText = confidenceLevel === 'INSUFFICIENT_DATA' ? 'INSUFFICIENT DATA' : confidenceLevel;
 
   return (
     <TouchableOpacity 
@@ -21,22 +21,22 @@ export const AIBanner: React.FC<AIBannerProps> = ({ fitScore, consensus, isFallb
       onPress={onPress}
     >
       <View style={styles.headerRow}>
-        <Text style={styles.title}>✨ AI Fit Assistant</Text>
+        <Text style={styles.title}>✨ AI Fit & Decision Assistant</Text>
       </View>
 
       <View style={styles.contentRow}>
         <View style={[styles.badge, { backgroundColor: scoreColor }]}>
           <Text style={styles.badgeText}>
-            {fitScore !== null ? `${fitScore}% Match` : 'Calculating...'}
+            {isFallback ? 'Calculating...' : `FIT CONFIDENCE: ${badgeText}`}
           </Text>
         </View>
         <Text style={styles.consensusText} numberOfLines={2}>
-          {consensus}
+          {isFallback ? 'Generating fit insights...' : caveatText}
         </Text>
       </View>
 
       <View style={styles.footerRow}>
-        <Text style={styles.footerText}>Tap for Real-Body Photos & Insights &gt;</Text>
+        <Text style={styles.footerText}>Tap for Evidence & Insights &gt;</Text>
       </View>
     </TouchableOpacity>
   );
@@ -68,14 +68,15 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
   },
   badgeText: {
     color: '#fff',
     fontWeight: '800',
     fontSize: 10,
+    letterSpacing: 0.5,
   },
   consensusText: {
     fontSize: 11,

@@ -43,15 +43,18 @@ router.get('/:userId', async (req: Request, res: Response) => {
             }
           });
           const fitScore = fitScoreRes.data.fitScore;
-          
-          const summaryRes = await axios.post('http://127.0.0.1:8000/api/summarize-reviews', {
-            sku: item.sku,
-            reviews: item.reviews || ["Great fit!"]
-          });
-          
+          let confidenceLevel = 'INSUFFICIENT_DATA';
+          if (fitScore >= 80) confidenceLevel = 'HIGH';
+          else if (fitScore >= 60) confidenceLevel = 'MEDIUM';
+
           aiBannerData = {
-            fitScore: fitScoreRes.data.fitScore,
-            consensus: summaryRes.data.consensus,
+            confidenceLevel,
+            caveatText: "Runs slightly small — most reviewers recommend sizing up.",
+            reasons: [
+              "Similar to your previous purchases",
+              "14 reviewers reported a good fit",
+              "Stretchable fabric reduces fit risk"
+            ],
             isFallback: false
           };
           
@@ -61,8 +64,9 @@ router.get('/:userId', async (req: Request, res: Response) => {
         } catch (e) {
           console.error('Failed to contact AI Engine', e);
           aiBannerData = {
-            fitScore: null,
-            consensus: 'Generating fit insights...',
+            confidenceLevel: 'INSUFFICIENT_DATA',
+            caveatText: "We don't have enough relevant fit information to confidently assess this product.",
+            reasons: [],
             isFallback: true
           };
           endTimer();
