@@ -1,0 +1,57 @@
+================================================================================
+ANTIGRAVITY TASK CONFIGURATION: MVP PROBLEM STATEMENT & SPECIFICATIONS
+PROJECT: MYNTRA WISHLIST REDESIGN — IN-WISHLIST DECISION ASSISTANT
+================================================================================
+
+[PROBLEM CONTEXT]
+High-intent fashion shoppers on Myntra abandon wishlisted items because the current 
+wishlist serves as a passive storage folder rather than an active decision-support tool[cite: 1, 2]. 
+Lacking real-world fit, fabric, and styling validation within the app, users migrate 
+off-platform to research on social media—leaving items to sit until they go out of stock[cite: 1, 2].
+
+[MVP CORE PROBLEM STATEMENT]
+High-intent fashion shoppers abandon wishlisted items due to pre-purchase decision 
+uncertainty (fit, sizing, real-body context) and silent inventory depletion, resulting in 
+a low 30-day wishlist-to-cart conversion rate[cite: 1, 2].
+
+[ROOT CAUSE ANALYSIS (5 WHYS)]
+Problem: Low 30-day wishlist-to-purchase conversion rate.
+├── Why? -> Users leave items sitting in their wishlist without moving them to the cart[cite: 1, 2].
+│     │
+│     ├── Why? -> Users lack decision confidence (sizing, fit, and styling) while viewing saved items[cite: 1, 2].
+│     │     │
+│     │     └── Why? -> PDPs rely on studio models, forcing users to leave Myntra for Instagram/YouTube for real-body try-on content[cite: 1, 2].
+│     │
+│     └── Why? -> Saved items go out of stock in specific sizes before users finish evaluating them[cite: 1, 2].
+│           │
+│           └── Why? -> The wishlist lacks dynamic inventory tracking and proactive size-depletion alerts[cite: 1, 2].
+
+[MVP TARGET USERS & JTBD]
+1. Primary Persona: Ananya (24, Bangalore) — The Fit-Anxious Stylist[cite: 1, 2]
+   - Profile: Metro fashion shopper with 30+ wishlisted items[cite: 1, 2].
+   - JTBD: "When reviewing wishlisted items, I want real-body fit and styling proof so I can move items to my cart without leaving the app."[cite: 1, 2]
+
+2. Secondary Persona: Rahul (27, Mumbai) — The Intentful Shortlister[cite: 1, 2]
+   - Profile: Metro fashion shopper shortlisting for events with 15+ items[cite: 1, 2].
+   - JTBD: "When saved items run low in my size, I want timely alerts and alternative suggestions so my shopping journey isn't broken."[cite: 1, 2]
+
+[MVP SOLUTION SPECIFICATION]
+Solution Name: Solution 1 — In-Wishlist AI Fit & Decision Assistant (ICE Score: 55.6)[cite: 1, 2]
+
+Core MVP Scope & Modules:
+1. Contextual In-Wishlist AI Banner:
+   - Real-time personal fit confidence score (0-100%) calculated against user body profile[cite: 1, 2].
+   - Dynamic consensus highlights (e.g., "Fits true to size for 5'6\", Medium")[cite: 1, 2].
+
+2. Bottom-Sheet Decision Drawer:
+   - Real-body try-on photo gallery curated from verified UGC matching user parameters[cite: 1, 2].
+   - Semantic AI review summaries detailing fabric stretch, durability, and fit nuances[cite: 1, 2].
+   - Cross-category styling recommendations paired with existing wishlist/wardrobe items[cite: 1, 2].
+
+3. One-Tap Cart Conversion:
+   - Sticky "Select Size & Move to Bag" CTA integrated directly inside the decision drawer[cite: 1, 2].
+
+[MVP SUCCESS METRICS & GUARDRAILS]
+- North Star Metric: 30-Day Wishlist-to-Purchase Conversion Rate (WPCR)[cite: 1, 2]
+- Primary Business Metrics: +12% Average Order Value (AOV) lift[cite: 1, 2], reduction in fit-related return rates[cite: 1, 2].
+- System Guardrail: P95 latency budget <= 500ms for AI banner rendering[cite: 1, 2].
