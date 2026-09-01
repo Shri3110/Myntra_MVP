@@ -4,12 +4,13 @@ import { useRouter } from 'expo-router';
 import { AppContext } from './_layout';
 import { AIBanner } from '../../components/AIBanner';
 import { DecisionDrawer } from '../../components/DecisionDrawer';
+import axios from 'axios';
 
 const getFallbackScore = (product: any) => {
   if (product.aiFit?.matchScore) return product.aiFit.matchScore;
   if (product.matchScore) return product.matchScore;
   const hash = product.sku.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  return 75 + (hash % 24); // Produces natural distribution between 75% and 98%
+  return 75 + (hash % 24); 
 };
 
 const getDynamicReviewText = (score: number) => {
@@ -18,10 +19,36 @@ const getDynamicReviewText = (score: number) => {
   return "Varied fit reported — check real-body reviews before buying";
 };
 
+const BFF_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'android' ? 'http://10.0.2.2:3001' : 'http://localhost:3001');
+
 export default function WishlistScreen() {
   const { wishlistItems, setWishlistItems, setBagCount, showToast } = useContext(AppContext);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
+  const [cardSelectedSizes, setCardSelectedSizes] = useState<Record<string, string>>({});
   const router = useRouter();
+
+  const handleQuickAddToBag = async (item: any) => {
+    const selectedSize = cardSelectedSizes[item.sku];
+    if (!selectedSize) {
+      alert('Please select a size first');
+      return;
+    }
+    
+    try {
+      await fetch(`${BFF_URL}/api/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 'user123', sku: item.sku, size: selectedSize })
+      });
+      
+      setWishlistItems((prev: any[]) => prev.filter(w => w.sku !== item.sku));
+      setBagCount((prev: number) => prev + 1);
+      showToast(`Success: Added ${item.sku} (${selectedSize}) to Bag!`);
+    } catch (e) {
+      console.error('Failed to add to bag', e);
+      alert('Could not add item to bag.');
+    }
+  };
 
   if (wishlistItems.length === 0) {
     return (
@@ -48,6 +75,7 @@ export default function WishlistScreen() {
         renderItem={({ item }) => {
           const fitScore = getFallbackScore(item.product);
           const reviewText = getDynamicReviewText(fitScore);
+          const isSizeSelected = !!cardSelectedSizes[item.sku];
 
           return (
           <View style={styles.card}>
@@ -88,14 +116,31 @@ export default function WishlistScreen() {
                 isFallback={item.aiBanner?.isFallback || false}
                 onPress={() => setSelectedSku(item.sku)}
               />
+              
+              {/* Quick Size Selector on Card */}
+              <View style={styles.cardSizeRow}>
+                {(item.product.availableSizes || ['S', 'M', 'L']).map((size: string) => {
+                  const isSelected = cardSelectedSizes[item.sku] === size;
+                  return (
+                    <TouchableOpacity 
+                      key={size} 
+                      style={[styles.cardSizeBtn, isSelected && styles.cardSizeBtnSelected]} 
+                      onPress={() => setCardSelectedSizes(prev => ({ ...prev, [item.sku]: size }))}
+                    >
+                      <Text style={[styles.cardSizeText, isSelected && styles.cardSizeTextSelected]}>{size}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
 
             <TouchableOpacity 
-              style={styles.moveToBagBtn}
+              style={[styles.moveToBagBtn, !isSizeSelected && styles.moveToBagBtnDisabled]}
               activeOpacity={0.8}
-              onPress={() => setSelectedSku(item.sku)}
+              disabled={!isSizeSelected}
+              onPress={() => handleQuickAddToBag(item)}
             >
-              <Text style={styles.moveToBagText}>MOVE TO BAG</Text>
+              <Text style={[styles.moveToBagText, !isSizeSelected && styles.moveToBagTextDisabled]}>MOVE TO BAG</Text>
             </TouchableOpacity>
           </View>
         )}}
@@ -236,6 +281,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ff905a',
   },
+  cardSizeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  cardSizeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#d4d5d9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  cardSizeBtnSelected: {
+    borderColor: '#E7396A',
+    backgroundColor: '#fff0f3',
+  },
+  cardSizeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#282c3f',
+  },
+  cardSizeTextSelected: {
+    color: '#E7396A',
+  },
   moveToBagBtn: {
     borderTopWidth: 1,
     borderTopColor: '#eaeaed',
@@ -243,11 +317,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    backgroundColor: '#fff',
+  },
+  moveToBagBtnDisabled: {
+    backgroundColor: '#f5f5f6',
   },
   moveToBagText: {
     color: '#E7396A',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
     letterSpacing: 0.5,
+  },
+  moveToBagTextDisabled: {
+    color: '#a9abb3',
   },
 });
