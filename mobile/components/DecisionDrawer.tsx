@@ -82,17 +82,6 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, aiBannerDat
   let caveatText = aiBannerData?.caveatText;
   let reasons = aiBannerData?.reasons || [];
   
-  // Override INSUFFICIENT_DATA if we actually have product/reviewer data loaded (Fix #2)
-  if (confidenceLevel === 'INSUFFICIENT_DATA' && data?.ugc?.length > 0) {
-    confidenceLevel = 'HIGH';
-    caveatText = caveatText || "Runs slightly small — most reviewers recommend sizing up.";
-    reasons = [
-      "Consistent with your past purchase history ('M', 'L')",
-      "Fabric stretch factor accommodates your body type",
-      `Analyzed ${data.ugc.length} verified reviews`
-    ];
-  }
-
   const isHighMatch = confidenceLevel === 'HIGH';
   const isModerateMatch = confidenceLevel === 'MEDIUM';
   const badgeColor = isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#8a8d9a';
@@ -107,6 +96,7 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, aiBannerDat
       enablePanDownToClose
       backgroundStyle={styles.bottomSheetBackground}
       handleComponent={data && !loading ? CustomHandle : undefined}
+      bottomInset={Platform.OS === 'ios' ? 80 : 60}
     >
       {loading ? (
         <BottomSheetView style={styles.center}>
@@ -223,6 +213,7 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, aiBannerDat
               style={[styles.primaryBtn, !selectedSize && styles.primaryBtnDisabled]} 
               onPress={handleMoveToBag}
               activeOpacity={0.8}
+              disabled={!selectedSize}
             >
               <Text style={[styles.primaryBtnText, !selectedSize && styles.primaryBtnTextDisabled]}>
                 MOVE TO BAG
