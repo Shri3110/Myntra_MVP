@@ -31,7 +31,16 @@ router.get('/:userId', async (req: Request, res: Response) => {
       if (cachedData) {
         aiBannerData = JSON.parse(cachedData);
       } else {
-        // Fallback: Trigger async generation via Python AI Engine
+        // Fetch UGC for this SKU to pass to LLM
+        let reviews: string[] = [];
+        try {
+          const ugcRes = await axios.get(`${getMockUrl()}/internal/ugc/${item.sku}`);
+          const media = ugcRes.data.media || [];
+          reviews = media.map((m: any) => m.reviewText).filter(Boolean);
+        } catch (e) {
+          console.error(`Failed to fetch UGC for ${item.sku}`, e);
+        }
+
         const endTimer = aiBannerLatencyHistogram.startTimer();
         try {
           const fitScoreRes = await axios.post('http://127.0.0.1:8000/api/fit-score', {
@@ -40,20 +49,23 @@ router.get('/:userId', async (req: Request, res: Response) => {
               sku: item.sku, 
               availableSizes: item.product.availableSizes || [],
               category: item.product.category || 'Clothing'
-            }
+            },
+            reviews
           });
-          const fitScore = fitScoreRes.data.fitScore;
+          
+          const engineData = fitScoreRes.data;
+          
           let confidenceLevel = 'INSUFFICIENT_DATA';
-          if (fitScore >= 80) confidenceLevel = 'HIGH';
-          else if (fitScore >= 60) confidenceLevel = 'MEDIUM';
+          if (engineData.confidence_tier === 'HIGH_CONFIDENCE') confidenceLevel = 'HIGH';
+          else if (engineData.confidence_tier === 'MEDIUM_CONFIDENCE') confidenceLevel = 'MEDIUM';
 
           aiBannerData = {
             confidenceLevel,
-            caveatText: "Runs slightly small — most reviewers recommend sizing up.",
+            caveatText: engineData.feedback_summary || "Runs slightly small — most reviewers recommend sizing up.",
             reasons: [
-              "Similar to your previous purchases",
-              "14 reviewers reported a good fit",
-              "Stretchable fabric reduces fit risk"
+              `Analyzed ${engineData.breakdown?.sample_size_evaluated || 0} matching reviews`,
+              `Sizing Consensus: ${engineData.breakdown?.consensus_percentage || 'N/A'}`,
+              `Attribute Alignment: ${engineData.breakdown?.attribute_alignment_score || 'N/A'}`
             ],
             isFallback: false
           };
