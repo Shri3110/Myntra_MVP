@@ -8,10 +8,16 @@ import { connectRedis } from './services/redis';
 import { connectChroma } from './services/chroma';
 import { metricsRegistry } from './telemetry';
 
+import mockApp from '../mocks/myntra-core';
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+process.env.MOCK_SERVICES_URL = `http://127.0.0.1:${PORT}`;
+
+app.use(mockApp);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/telemetry', telemetryRoutes);
@@ -22,7 +28,6 @@ app.get('/metrics', async (req, res) => {
   res.send(await metricsRegistry.metrics());
 });
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
 const startServer = async () => {
   try {

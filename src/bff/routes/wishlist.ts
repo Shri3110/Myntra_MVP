@@ -5,14 +5,14 @@ import { aiBannerLatencyHistogram } from '../telemetry';
 
 const router = Router();
 
-const MOCK_SERVICES_URL = 'http://127.0.0.1:4000';
+const getMockUrl = () => process.env.MOCK_SERVICES_URL || 'http://127.0.0.1:3001';
 
 router.get('/:userId', async (req: Request, res: Response) => {
   const { userId } = req.params;
   
   try {
     // 1. Fetch wishlist from existing Myntra Service
-    const wishlistRes = await axios.get(`${MOCK_SERVICES_URL}/internal/wishlist/${userId}`);
+    const wishlistRes = await axios.get(`${getMockUrl()}/internal/wishlist/${userId}`);
     const { items, userProfile } = wishlistRes.data;
 
     // 2. Fetch AI Banner Data (Fit Score & Semantics) concurrently from Redis
@@ -91,11 +91,11 @@ router.get('/details/:userId/:sku', async (req: Request, res: Response) => {
 
   try {
     // 1. Fetch UGC
-    const ugcRes = await axios.get(`${MOCK_SERVICES_URL}/internal/ugc/${sku}`);
+    const ugcRes = await axios.get(`${getMockUrl()}/internal/ugc/${sku}`);
     const media = ugcRes.data.media;
 
     // 2. Fetch Real-time Inventory
-    const inventoryRes = await axios.get(`${MOCK_SERVICES_URL}/internal/inventory/${sku}`);
+    const inventoryRes = await axios.get(`${getMockUrl()}/internal/inventory/${sku}`);
     const inventory = inventoryRes.data.inventory;
 
     // 3. Fetch Styling Recommendations (AI Engine)
@@ -124,7 +124,7 @@ router.get('/details/:userId/:sku', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const response = await axios.post(`${MOCK_SERVICES_URL}/internal/wishlist`, req.body);
+    const response = await axios.post(`${getMockUrl()}/internal/wishlist`, req.body);
     res.json(response.data);
   } catch (error: any) {
     console.error('Error adding to wishlist', error.message);

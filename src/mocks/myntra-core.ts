@@ -288,7 +288,4 @@ app.post('/internal/wishlist', (req, res) => {
   res.json({ success: true, message: 'Added to wishlist' });
 });
 
-const PORT = 4000;
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`[Mock Service] Myntra Core Services running on port ${PORT}`);
-});
+export default app;

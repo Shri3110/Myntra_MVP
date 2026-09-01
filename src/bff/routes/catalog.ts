@@ -2,11 +2,11 @@ import { Router, Request, Response } from 'express';
 import axios from 'axios';
 
 const router = Router();
-const MOCK_SERVICES_URL = 'http://127.0.0.1:4000';
+const getMockUrl = () => process.env.MOCK_SERVICES_URL || 'http://127.0.0.1:3001';
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const catalogRes = await axios.get(`${MOCK_SERVICES_URL}/internal/catalog`);
+    const catalogRes = await axios.get(`${getMockUrl()}/internal/catalog`);
     res.json(catalogRes.data);
   } catch (error) {
     console.error('Error fetching catalog', error);
