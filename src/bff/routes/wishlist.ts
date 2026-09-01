@@ -5,7 +5,7 @@ import { aiBannerLatencyHistogram } from '../telemetry';
 
 const router = Router();
 
-const MOCK_SERVICES_URL = 'http://localhost:4000';
+const MOCK_SERVICES_URL = 'http://127.0.0.1:4000';
 
 router.get('/:userId', async (req: Request, res: Response) => {
   const { userId } = req.params;

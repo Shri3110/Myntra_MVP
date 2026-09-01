@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import axios from 'axios';
 
 const router = Router();
-const MOCK_SERVICES_URL = 'http://localhost:4000';
+const MOCK_SERVICES_URL = 'http://127.0.0.1:4000';
 
 router.get('/', async (req: Request, res: Response) => {
   try {
