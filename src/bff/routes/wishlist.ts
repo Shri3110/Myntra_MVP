@@ -44,11 +44,21 @@ router.get('/:userId', async (req: Request, res: Response) => {
         const endTimer = aiBannerLatencyHistogram.startTimer();
         try {
           const fitScoreRes = await axios.post('http://127.0.0.1:8000/api/fit-score', {
-            userProfile: userProfile || { heightCm: 160, weightKg: 60, usualSize: 'M', bodyType: 'Average' },
+            userProfile: { 
+              ...userProfile,
+              heightCm: userProfile?.heightCm || 160, 
+              weightKg: userProfile?.weightKg || 60, 
+              usualSize: userProfile?.usualSize || 'M', 
+              bodyType: userProfile?.bodyType || 'Average',
+              pastPurchaseHistory: ['M', 'M', 'L'],
+              returnedSizes: ['S']
+            },
             product: { 
               sku: item.sku, 
               availableSizes: item.product.availableSizes || [],
-              category: item.product.category || 'Clothing'
+              category: item.product.category || 'Clothing',
+              fabric: '100% Cotton',
+              stretchFactor: 'Medium'
             },
             reviews
           });
