@@ -9,7 +9,7 @@
     "seed": "tsx src/scripts/ingest-catalog.ts",
     "load-test": "tsx src/scripts/load-test.ts",
     "build": "tsc",
-    "start": "node dist/mocks/myntra-core.js & node dist/bff/server.js"
+    "start": "node dist/start.js"
   },
   "keywords": [],
   "author": "",
