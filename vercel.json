@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd mobile && npm install && npm run build:web",
+  "outputDirectory": "mobile/dist"
+}
