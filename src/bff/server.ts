@@ -22,7 +22,7 @@ app.get('/metrics', async (req, res) => {
   res.send(await metricsRegistry.metrics());
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
 const startServer = async () => {
   try {
