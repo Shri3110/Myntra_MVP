@@ -2,17 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface AIBannerProps {
-  fitScore: number | null;
-  consensus: string;
+  confidenceLevel: 'HIGH' | 'MEDIUM' | 'LOW';
+  caveatText: string;
   isFallback: boolean;
-  badgeColor?: string;
   onPress?: () => void;
 }
 
-export const AIBanner: React.FC<AIBannerProps> = ({ fitScore, consensus, isFallback, badgeColor, onPress }) => {
-  const isHighMatch = fitScore && fitScore >= 90;
-  const isModerateMatch = fitScore && fitScore >= 60 && fitScore < 90;
-  const scoreColor = badgeColor || (isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#8a8d9a');
+export const AIBanner: React.FC<AIBannerProps> = ({ confidenceLevel, caveatText, onPress }) => {
+  const isHighMatch = confidenceLevel === 'HIGH';
+  const isModerateMatch = confidenceLevel === 'MEDIUM';
+  const scoreColor = isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#E7396A';
 
   return (
     <TouchableOpacity 
@@ -21,22 +20,22 @@ export const AIBanner: React.FC<AIBannerProps> = ({ fitScore, consensus, isFallb
       onPress={onPress}
     >
       <View style={styles.headerRow}>
-        <Text style={styles.title}>✨ AI Fit Assistant</Text>
+        <Text style={styles.title}>✨ AI Fit & Decision Assistant</Text>
       </View>
 
       <View style={styles.contentRow}>
         <View style={[styles.badge, { backgroundColor: scoreColor }]}>
           <Text style={styles.badgeText}>
-            {fitScore !== null ? `${fitScore}% Match` : 'Calculating...'}
+            FIT CONFIDENCE: {confidenceLevel}
           </Text>
         </View>
         <Text style={styles.consensusText} numberOfLines={2}>
-          {consensus}
+          {caveatText}
         </Text>
       </View>
 
       <View style={styles.footerRow}>
-        <Text style={styles.footerText}>Tap for Real-Body Photos & Insights &gt;</Text>
+        <Text style={styles.footerText}>Tap for Evidence & Insights &gt;</Text>
       </View>
     </TouchableOpacity>
   );

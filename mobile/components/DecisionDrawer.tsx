@@ -4,13 +4,14 @@ import BottomSheet, { BottomSheetView, BottomSheetScrollView, BottomSheetFooter 
 
 interface DecisionDrawerProps {
   sku: string | null;
+  aiBannerData?: any;
   onClose: () => void;
   onSuccess?: (sku: string, size: string, totalItemsAdded: number) => void;
 }
 
 const BFF_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'android' ? 'http://10.0.2.2:3001' : 'http://localhost:3001');
 
-export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, onClose, onSuccess }) => {
+export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, aiBannerData, onClose, onSuccess }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['75%', '95%'], []);
   
@@ -18,6 +19,16 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, onClose, on
   const [loading, setLoading] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedStyles, setSelectedStyles] = useState<Set<string>>(new Set());
+
+  // Derive ai state locally
+  let confidenceLevel = aiBannerData?.confidenceLevel || 'LOW';
+  let caveatText = aiBannerData?.caveatText;
+  let reasons = aiBannerData?.reasons || [];
+  let recommendedSize = aiBannerData?.recommendedSize || 'M';
+  
+  const isHighMatch = confidenceLevel === 'HIGH';
+  const isModerateMatch = confidenceLevel === 'MEDIUM';
+  const badgeColor = isHighMatch ? '#00A66C' : isModerateMatch ? '#EAA100' : '#E7396A';
 
   useEffect(() => {
     if (sku) {
@@ -67,43 +78,13 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, onClose, on
     (props: any) => (
       <BottomSheetFooter {...props} bottomInset={0}>
         <View style={styles.stickyFooter}>
-          <Text style={styles.sizeTitle}>Select Size</Text>
-          <View style={styles.sizeRow}>
-            {['S', 'M', 'L', 'XL'].map(size => {
-              const stock = data?.inventory?.[size] ?? 10;
-              const isSelected = selectedSize === size;
-              const isOOS = stock === 0;
-
-              return (
-                <TouchableOpacity
-                  key={size}
-                  style={[
-                    styles.sizeBtn,
-                    isSelected && styles.sizeBtnSelected,
-                    isOOS && styles.sizeBtnDisabled
-                  ]}
-                  onPress={() => !isOOS && setSelectedSize(size)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[
-                    styles.sizeText,
-                    isSelected && styles.sizeTextSelected,
-                    isOOS && styles.sizeTextDisabled
-                  ]}>{size}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
           <TouchableOpacity 
             style={[styles.primaryBtn, !selectedSize && styles.primaryBtnDisabled]} 
             onPress={handleMoveToBag}
             activeOpacity={0.8}
           >
             <Text style={[styles.primaryBtnText, !selectedSize && styles.primaryBtnTextDisabled]}>
-              {selectedStyles.size > 0 
-                ? `MOVE OUTFIT TO BAG (${selectedStyles.size + 1} ITEMS)`
-                : 'MOVE TO BAG'}
+              MOVE TO BAG
             </Text>
           </TouchableOpacity>
         </View>
@@ -155,86 +136,103 @@ export const DecisionDrawer: React.FC<DecisionDrawerProps> = ({ sku, onClose, on
       ) : (
         <BottomSheetScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
               
-              <Text style={styles.sectionTitle}>Real-Body Try-On Gallery</Text>
-              <Text style={styles.sectionSubtitle}>See how it looks on shoppers like you</Text>
-              
-              {data.ugc && data.ugc.length > 0 ? (
-                <FlatList
-                  horizontal
-                  data={data.ugc}
-                  keyExtractor={(item) => item.id}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.galleryList}
-                  renderItem={({ item }) => (
-                    <View style={styles.ugcWrapper}>
-                      <Image source={{ uri: item.url }} style={styles.ugcImage} />
-                      <Text style={styles.ugcHandle}>{item.username}</Text>
+              <View style={styles.confidenceSection}>
+                <View style={[styles.badge, { backgroundColor: badgeColor }]}>
+                  <Text style={styles.badgeText}>FIT CONFIDENCE: {confidenceLevel}</Text>
+                </View>
+                
+                <Text style={styles.whyTitle}>Why we think so:</Text>
+                <View style={styles.reasonsList}>
+                  {reasons.map((reason: string, idx: number) => (
+                    <View key={idx} style={styles.reasonItem}>
+                      <Text style={styles.checkIcon}>✓</Text>
+                      <Text style={styles.reasonText}>{reason}</Text>
                     </View>
-                  )}
-                />
-              ) : (
+                  ))}
+                </View>
+              </View>
+
+              {caveatText && (
+                <View style={styles.caveatBox}>
+                  <Text style={styles.caveatTitle}>⚠ SIZING CAVEAT</Text>
+                  <Text style={styles.caveatText}>{caveatText}</Text>
+                </View>
+              )}
+              
+              <View style={styles.divider} />
+
+              <Text style={styles.sectionTitle}>REAL-USER FIT EVIDENCE</Text>
+              <Text style={styles.sectionSubtitle}>See how it looks on reviewers who bought this size</Text>
+              
+              {data?.ugc && data.ugc.length > 0 ? (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryList}>
-                  {[
-                    { id: 'mock1', url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=200', username: '@style1' },
-                    { id: 'mock2', url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=200', username: '@style2' },
-                    { id: 'mock3', url: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200', username: '@style3' }
-                  ].map(item => (
+                  {data.ugc.map((item: any) => (
                     <View key={item.id} style={styles.ugcWrapper}>
                       <Image source={{ uri: item.url }} style={styles.ugcImage} />
-                      <Text style={styles.ugcHandle}>{item.username}</Text>
+                      <View style={styles.ugcMetaBox}>
+                        <Text style={styles.ugcHandle}>{item.username}</Text>
+                        <Text style={styles.ugcSize}>Bought size: {item.size}</Text>
+                        <Text style={styles.ugcComment} numberOfLines={2}>"{item.comment}"</Text>
+                      </View>
                     </View>
                   ))}
                 </ScrollView>
+              ) : (
+                <Text style={styles.insufficientText}>
+                  No user fit evidence available for this product yet.
+                </Text>
               )}
 
               <View style={styles.divider} />
 
-              <Text style={styles.sectionTitle}>Sizing & Fabric Insights</Text>
+              <Text style={styles.sectionTitle}>SIZING & FABRIC INSIGHTS</Text>
               <View style={styles.bulletList}>
-                <Text style={styles.bulletItem}>• 14 shoppers with similar build loved the fit.</Text>
+                <Text style={styles.bulletItem}>• 14 reviewers who bought this size reported a good fit.</Text>
                 <Text style={styles.bulletItem}>• Fabric: 100% Cotton, stretchable waist.</Text>
                 <Text style={styles.bulletItem}>• Note: Runs slightly long, great for heels.</Text>
               </View>
 
-              {data.stylingRecommendations && data.stylingRecommendations.length > 0 && (
-                <>
-                  <View style={styles.divider} />
-                  <Text style={styles.sectionTitle}>Outfit Styling Suggestions</Text>
-                  
-                  <FlatList
-                    horizontal
-                    data={data.stylingRecommendations}
-                    keyExtractor={(item) => item.sku}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.galleryList}
-                    renderItem={({ item }) => {
-                      const isSelected = selectedStyles.has(item.sku);
-                      return (
-                        <TouchableOpacity 
-                          style={[styles.styleCard, isSelected && styles.styleCardSelected]}
-                          onPress={() => {
-                            setSelectedStyles(prev => {
-                              const newSet = new Set(prev);
-                              if (newSet.has(item.sku)) newSet.delete(item.sku);
-                              else newSet.add(item.sku);
-                              return newSet;
-                            });
-                          }}
-                          activeOpacity={0.8}
-                        >
-                          <Image source={{ uri: item.imageUrl }} style={[styles.styleImage, isSelected && styles.styleImageSelected]} />
-                          {isSelected && (
-                            <View style={styles.checkmarkBadge}>
-                              <Text style={styles.checkmarkText}>✓</Text>
-                            </View>
-                          )}
-                          <Text style={styles.styleName} numberOfLines={2}>{item.name}</Text>
-                        </TouchableOpacity>
-                      );
-                    }}
-                  />
-                </>
-              )}
+              <View style={styles.divider} />
+
+              <View style={styles.selectSizeSection}>
+                <Text style={styles.sizeTitle}>SELECT SIZE</Text>
+                {recommendedSize && (
+                  <Text style={styles.recommendedText}>RECOMMENDED: {recommendedSize}</Text>
+                )}
+                
+                <View style={styles.sizeRow}>
+                  {['S', 'M', 'L', 'XL'].map(size => {
+                    const stock = data?.inventory?.[size] ?? 10;
+                    const isSelected = selectedSize === size;
+                    const isOOS = stock === 0;
+
+                    return (
+                      <TouchableOpacity
+                        key={size}
+                        style={[
+                          styles.sizeBtn,
+                          isSelected && styles.sizeBtnSelected,
+                          isOOS && styles.sizeBtnDisabled
+                        ]}
+                        onPress={() => !isOOS && setSelectedSize(size)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[
+                          styles.sizeText,
+                          isSelected && styles.sizeTextSelected,
+                          isOOS && styles.sizeTextDisabled
+                        ]}>{size}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {selectedSize && recommendedSize && selectedSize !== recommendedSize && (
+                  <Text style={styles.advisoryMessage}>
+                    You selected {selectedSize}. AI suggests {recommendedSize} based on your fit evidence.
+                  </Text>
+                )}
+              </View>
+
             </BottomSheetScrollView>
       )}
     </BottomSheet>
@@ -249,6 +247,96 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+  },
+  confidenceSection: {
+    marginBottom: 16,
+  },
+  badge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginBottom: 12,
+  },
+  badgeText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 12,
+    letterSpacing: 0.5,
+  },
+  insufficientText: {
+    fontSize: 14,
+    color: '#7e818c',
+    fontStyle: 'italic',
+    lineHeight: 20,
+  },
+  whyTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#282c3f',
+    marginBottom: 8,
+  },
+  reasonsList: {
+    gap: 8,
+  },
+  reasonItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  checkIcon: {
+    color: '#00A66C',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  reasonText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#3e4152',
+    lineHeight: 18,
+  },
+  caveatBox: {
+    backgroundColor: '#fff5f5',
+    borderWidth: 1,
+    borderColor: '#ffd1d1',
+    borderRadius: 6,
+    padding: 12,
+    marginTop: 16,
+  },
+  caveatTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#E7396A',
+    marginBottom: 4,
+  },
+  caveatText: {
+    fontSize: 13,
+    color: '#3e4152',
+    lineHeight: 18,
+  },
+  ugcMetaBox: {
+    marginTop: 8,
+  },
+  ugcSize: {
+    fontSize: 10,
+    color: '#7e818c',
+    marginTop: 2,
+  },
+  ugcComment: {
+    fontSize: 11,
+    color: '#3e4152',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  selectSizeSection: {
+    marginTop: 8,
+  },
+  recommendedText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#03a685',
+    marginBottom: 12,
   },
   handleContainer: {
     backgroundColor: '#fff',
@@ -450,5 +538,12 @@ const styles = StyleSheet.create({
   },
   primaryBtnTextDisabled: {
     color: '#94969F',
+  },
+  advisoryMessage: {
+    fontSize: 12,
+    color: '#7e818c',
+    fontStyle: 'italic',
+    marginTop: 8,
+    lineHeight: 16,
   },
 });

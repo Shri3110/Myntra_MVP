@@ -1,27 +1,48 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppContext } from './_layout';
 import { AIBanner } from '../../components/AIBanner';
 import { DecisionDrawer } from '../../components/DecisionDrawer';
 
-const getFallbackScore = (product: any) => {
-  if (product.aiFit?.matchScore) return product.aiFit.matchScore;
-  if (product.matchScore) return product.matchScore;
-  const hash = product.sku.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  return 75 + (hash % 24); // Produces natural distribution between 75% and 98%
-};
-
-const getDynamicReviewText = (score: number) => {
-  if (score >= 90) return "Verified true to size by 40+ buyers";
-  if (score >= 70) return "Runs slightly small — 65% of buyers recommend sizing up";
-  return "Varied fit reported — check real-body reviews before buying";
-};
-
 export default function WishlistScreen() {
   const { wishlistItems, setWishlistItems, setBagCount, showToast } = useContext(AppContext);
   const [selectedSku, setSelectedSku] = useState<string | null>(null);
+  const [banners, setBanners] = useState<Record<string, any>>({});
   const router = useRouter();
+  
+  const BFF_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'android' ? 'http://10.0.2.2:3001' : 'http://localhost:3001');
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      const newBanners = { ...banners };
+      let updated = false;
+
+      for (const item of wishlistItems) {
+        if (!newBanners[item.sku]) {
+          try {
+            const res = await fetch(`${BFF_URL}/api/wishlist/banner/user123`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ item: { sku: item.sku, product: item.product || item } })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              newBanners[item.sku] = data;
+              updated = true;
+            }
+          } catch (e) {
+            console.error('Failed to fetch banner for', item.sku);
+          }
+        }
+      }
+      if (updated) {
+        setBanners(newBanners);
+      }
+    };
+
+    fetchBanners();
+  }, [wishlistItems]);
 
   if (wishlistItems.length === 0) {
     return (
@@ -46,8 +67,14 @@ export default function WishlistScreen() {
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
-          const fitScore = getFallbackScore(item.product);
-          const reviewText = getDynamicReviewText(fitScore);
+          const aiBanner = item.aiBanner || banners[item.sku] || {
+            confidenceLevel: 'LOW',
+            caveatText: 'Calculating sizing insights...',
+            reasons: ['Please wait while we gather fit data'],
+            recommendedSize: 'M',
+            recommendedSizeRationale: 'Fallback',
+            isFallback: true
+          };
 
           return (
           <View style={styles.card}>
@@ -81,12 +108,10 @@ export default function WishlistScreen() {
                 )}
               </View>
               
-              {/* Contextual AI Banner */}
               <AIBanner 
-                fitScore={fitScore}
-                badgeColor={item.product?.aiFit?.badgeColor} 
-                consensus={reviewText}
-                isFallback={!item.product?.aiFit?.matchScore}
+                confidenceLevel={aiBanner.confidenceLevel as any}
+                caveatText={aiBanner.caveatText}
+                isFallback={aiBanner.isFallback}
                 onPress={() => setSelectedSku(item.sku)}
               />
             </View>
@@ -104,6 +129,7 @@ export default function WishlistScreen() {
 
       <DecisionDrawer 
         sku={selectedSku} 
+        aiBannerData={wishlistItems.find((i: any) => i.sku === selectedSku)?.aiBanner || banners[selectedSku || '']}
         onClose={() => setSelectedSku(null)} 
         onSuccess={(sku, size, addedCount = 1) => {
           setWishlistItems((prev: any[]) => prev.filter(item => item.sku !== sku));

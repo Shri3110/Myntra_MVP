@@ -42,7 +42,6 @@ export default function OrderConfirmationScreen() {
           </View>
 
           <Text style={styles.statusText}>Order Confirmed</Text>
-          <Text style={styles.deliveryText}>Estimated Delivery: Aug 30 - Sep 1</Text>
         </View>
 
         {/* Order Details Card */}
@@ -163,10 +162,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#282c3f',
     marginBottom: 4,
-  },
-  deliveryText: {
-    fontSize: 14,
-    color: '#535766',
   },
   sectionTitle: {
     width: '100%',

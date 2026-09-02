@@ -1,0 +1,573 @@
+Use this exact prompt with Antigravity. It is designed to make the **Fit Confidence Engine genuinely calculate HIGH / MEDIUM / LOW per product**, rather than hard-code the result.
+
+```text
+I need you to implement the actual Fit Confidence calculation logic in the existing Myntra AI Fit & Decision Assistant MVP.
+
+DO NOT redesign the UI.
+DO NOT change the current MVP scope.
+DO NOT add new features.
+
+The goal is to replace the current static/hard-coded Fit Confidence behavior with a deterministic, product-specific scoring engine.
+
+==================================================
+CORE REQUIREMENT
+==================================================
+
+Every product must ALWAYS receive exactly ONE of these three user-facing confidence levels:
+
+HIGH
+MEDIUM
+LOW
+
+There must be NO:
+
+“INSUFFICIENT DATA”
+“UNKNOWN”
+“N/A”
+“NO DATA”
+
+state in the user-facing UI.
+
+The engine must calculate the confidence separately for each product.
+
+Different products should be capable of producing different results:
+
+Product A → HIGH
+Product B → MEDIUM
+Product C → LOW
+
+Do NOT hard-code HIGH, MEDIUM, or LOW globally.
+
+==================================================
+FIT CONFIDENCE ENGINE
+==================================================
+
+Use a deterministic weighted scoring model with a total score of 100.
+
+The score must combine three evidence groups:
+
+1. USER HISTORY MATCH — 40 points
+2. PRODUCT-SPECIFIC REVIEW EVIDENCE — 35 points
+3. PRODUCT FIT CHARACTERISTICS — 25 points
+
+Total:
+
+40 + 35 + 25 = 100
+
+==================================================
+1. USER HISTORY MATCH — MAX 40 POINTS
+==================================================
+
+Calculate how well the selected product matches the user's previous purchase and sizing history.
+
+Use:
+
+A. Same-brand purchase history
+B. Previous sizes purchased
+C. Previous fit outcomes where available
+
+Suggested scoring:
+
++20 points
+User has previously purchased from the same brand and has a successful/positive fit history.
+
++10 points
+User has purchased similar products/categories before with a known successful size.
+
++10 points
+The user's historically successful size aligns with the product's available sizing and product-specific evidence.
+
+Maximum = 40.
+
+If the user has no relevant history, award 0 for that component.
+
+IMPORTANT:
+
+Do not invent user history.
+
+Use the existing demo user's purchase history/data already present in the application.
+
+==================================================
+2. PRODUCT-SPECIFIC REVIEW EVIDENCE — MAX 35 POINTS
+==================================================
+
+This MUST come from reviews associated with the EXACT product being viewed.
+
+Do NOT use global reviews.
+
+Do NOT reuse reviews from another product.
+
+Do NOT reuse the same customer photos across unrelated products.
+
+Calculate the score using:
+
+A. Volume of relevant fit/size reviews
+B. Consistency of fit feedback
+C. Direction of the feedback
+
+Suggested scoring:
+
+0–10 points:
+Very limited relevant fit evidence.
+
+11–20 points:
+Some relevant fit evidence exists, but feedback is mixed or limited.
+
+21–28 points:
+Good volume of relevant fit feedback with a reasonably consistent pattern.
+
+29–35 points:
+Strong product-specific fit evidence with a clear and consistent pattern.
+
+Then adjust within the range based on sentiment:
+
+Positive/consistent fit feedback → higher score.
+
+Mixed feedback → middle of range.
+
+Predominantly negative/inconsistent fit feedback → lower score.
+
+IMPORTANT:
+
+The engine must distinguish between:
+
+“True to size”
+“Runs small”
+“Runs large”
+“Mixed sizing”
+“Good fit”
+“Poor fit”
+
+Do not treat every review as positive evidence.
+
+==================================================
+3. PRODUCT FIT CHARACTERISTICS — MAX 25 POINTS
+==================================================
+
+Use information belonging to the EXACT product.
+
+Consider:
+
+A. Product fit type
+- Regular
+- Slim
+- Relaxed
+- Oversized
+- Fitted
+
+B. Fabric/stretch
+- Stretch
+- Non-stretch
+
+C. Product size chart / measurements
+
+D. Product-specific sizing caveats
+
+Suggested scoring:
+
+20–25:
+Product characteristics provide strong and predictable fit information.
+
+12–19:
+Some useful fit information exists but there are caveats.
+
+0–11:
+Fit characteristics create greater uncertainty or potential fit risk.
+
+Examples:
+
+Stretchable + regular fit + clear sizing information
+→ higher score
+
+Non-stretch + slim fit + mixed sizing feedback
+→ lower score
+
+==================================================
+FINAL SCORE
+==================================================
+
+Calculate:
+
+Fit Confidence Score =
+User History Score
++
+Product Review Evidence Score
++
+Product Fit Characteristics Score
+
+Maximum = 100.
+
+Then convert the score into exactly three confidence levels:
+
+70–100 → HIGH
+
+40–69 → MEDIUM
+
+0–39 → LOW
+
+These thresholds must be implemented in the backend/business logic.
+
+Do NOT allow the LLM to independently decide the confidence level.
+
+==================================================
+IMPORTANT: CONFIDENCE IS NOT THE SAME AS SIZE RECOMMENDATION
+==================================================
+
+Do not confuse:
+
+FIT CONFIDENCE
+
+with:
+
+RECOMMENDED SIZE.
+
+They are two separate outputs.
+
+Fit Confidence answers:
+
+“How strong is the evidence supporting this purchase decision?”
+
+Recommended Size answers:
+
+“Given the available evidence, which size should the user consider?”
+
+The confidence score must NOT simply be based on whether the recommended size is M.
+
+==================================================
+PRODUCT-SPECIFIC EXAMPLE
+==================================================
+
+For Product A:
+
+User History = 35/40
+Review Evidence = 30/35
+Product Characteristics = 21/25
+
+Total = 86
+
+Result:
+
+FIT CONFIDENCE: HIGH
+
+For Product B:
+
+User History = 18/40
+Review Evidence = 20/35
+Product Characteristics = 15/25
+
+Total = 53
+
+Result:
+
+FIT CONFIDENCE: MEDIUM
+
+For Product C:
+
+User History = 5/40
+Review Evidence = 12/35
+Product Characteristics = 10/25
+
+Total = 27
+
+Result:
+
+FIT CONFIDENCE: LOW
+
+These numbers are examples of the scoring logic only.
+
+DO NOT hard-code these exact scores for all products.
+
+The actual score must be calculated from each product's data.
+
+==================================================
+DYNAMIC “WHY WE THINK SO”
+==================================================
+
+After calculating the confidence score, generate 2–3 concise reasons based ONLY on the signals that actually contributed to the score.
+
+Example HIGH:
+
+FIT CONFIDENCE: HIGH
+
+Why we think so:
+✓ Similar to your previous purchases
+✓ Most reviewers report a good fit
+✓ Stretchable fabric reduces fit risk
+
+Example MEDIUM:
+
+FIT CONFIDENCE: MEDIUM
+
+Why we think so:
+✓ Similar brand sizing history
+⚠ Mixed reviewer feedback
+⚠ Limited product-specific fit evidence
+
+Example LOW:
+
+FIT CONFIDENCE: LOW
+
+Why we think so:
+⚠ Limited fit history for this brand
+⚠ Mixed sizing feedback
+⚠ Non-stretch fabric increases fit uncertainty
+
+IMPORTANT:
+
+The reasons must be dynamically generated from the actual scoring inputs.
+
+Do NOT display the same three reasons for every product.
+
+==================================================
+SIZING CAVEAT
+==================================================
+
+The sizing caveat must also be product-specific.
+
+Examples:
+
+“Runs slightly small — several reviewers recommend sizing up.”
+
+“Runs true to size based on recent reviews.”
+
+“Runs slightly large — consider sizing down.”
+
+“Review feedback is mixed on fit.”
+
+Do NOT show the same sizing caveat for every product.
+
+==================================================
+RECOMMENDED SIZE
+==================================================
+
+The recommended size must be calculated separately from Fit Confidence.
+
+Use:
+
+1. User's previous successful sizes
+2. Same-brand sizing history
+3. Product-specific reviewer size patterns
+4. Product size chart
+5. Product-specific sizing caveats
+
+The recommendation must NOT always be M.
+
+Examples:
+
+Product A → Recommended M
+Product B → Recommended S
+Product C → Recommended L
+
+These are examples only.
+
+The actual recommendation must depend on the selected product and user data.
+
+The user must always be able to override the recommendation manually.
+
+==================================================
+REAL-BODY EVIDENCE
+==================================================
+
+The Real-Body Evidence section MUST use reviews/photos belonging to the exact selected product.
+
+Implement product-level data mapping:
+
+product_id
+→ reviews
+→ customer photos
+→ purchased sizes
+→ fit comments
+→ sizing observations
+
+When the user switches products:
+
+ALL of these must update:
+
+- Fit Confidence
+- Confidence reasons
+- Real-Body Evidence
+- Review snippets
+- Customer photos
+- Sizing caveat
+- Recommended size
+- Recommended-size rationale
+
+No global/static evidence is allowed.
+
+==================================================
+LLM ROLE
+==================================================
+
+The LLM must NOT determine the numerical Fit Confidence score.
+
+The deterministic engine calculates:
+
+Score → HIGH / MEDIUM / LOW
+
+The LLM may only be used to turn the calculated evidence into a concise human-readable explanation.
+
+Pipeline:
+
+User History
++
+Product Specs
++
+Product-Specific Review Evidence
+
+↓
+
+DETERMINISTIC FIT CONFIDENCE ENGINE
+
+↓
+
+Score 0–100
+
+↓
+
+HIGH / MEDIUM / LOW
+
+↓
+
+LLM EXPLANATION LAYER
+
+↓
+
+Decision Card
+
+==================================================
+USER-FACING UI
+==================================================
+
+Do NOT show the numerical score.
+
+Do NOT show:
+
+86%
+72%
+91%
+
+Instead show:
+
+FIT CONFIDENCE: HIGH
+
+or
+
+FIT CONFIDENCE: MEDIUM
+
+or
+
+FIT CONFIDENCE: LOW
+
+The user sees:
+
+FIT CONFIDENCE
+↓
+WHY WE THINK SO
+↓
+SIZING CAVEAT
+↓
+REAL-BODY EVIDENCE
+↓
+SIZING & FABRIC INSIGHTS
+↓
+RECOMMENDED SIZE
+↓
+SELECT SIZE
+↓
+MOVE TO BAG
+
+==================================================
+FALLBACK LOGIC
+==================================================
+
+There must never be an “Insufficient Data” confidence state.
+
+If evidence is weak:
+
+→ LOW
+
+If evidence is mixed:
+
+→ MEDIUM
+
+If evidence is strong and consistent:
+
+→ HIGH
+
+The system must still explain WHY the confidence is low/medium/high.
+
+==================================================
+TESTING REQUIREMENT
+==================================================
+
+After implementing the engine, test it against at least 5 different products.
+
+Create a debug/test output showing for each product:
+
+Product Name
+User History Score /40
+Review Evidence Score /35
+Product Characteristics Score /25
+Total Score /100
+Final Confidence
+
+Example:
+
+Product A
+35 + 30 + 21 = 86
+HIGH
+
+Product B
+18 + 20 + 15 = 53
+MEDIUM
+
+Product C
+5 + 12 + 10 = 27
+LOW
+
+Verify that the values are actually calculated from product-specific data.
+
+Also verify:
+
+✓ Confidence changes between products
+✓ Review evidence changes between products
+✓ Customer photos change between products
+✓ Sizing caveats change where appropriate
+✓ Recommended size is not always M
+✓ Recommended-size rationale changes
+✓ No “Insufficient Data” appears anywhere in the user-facing UI
+✓ No generic customer photo is presented as product-specific evidence
+✓ No Phase 2 features are introduced
+
+==================================================
+FINAL PRODUCT PRINCIPLE
+==================================================
+
+The system should behave as:
+
+USER + PRODUCT + EVIDENCE
+
+↓
+
+FIT CONFIDENCE ENGINE
+
+↓
+
+HIGH / MEDIUM / LOW
+
+↓
+
+EXPLAINABLE DECISION SUPPORT
+
+↓
+
+SIZE SELECTION
+
+↓
+
+MOVE TO BAG
+
+The objective is NOT to claim that the AI can perfectly predict whether a garment will fit.
+
+The objective is to give the user an evidence-backed confidence signal that helps them make a better purchase decision.
+```

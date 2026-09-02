@@ -21,15 +21,11 @@ const wishlists: any = {
   'user123': [
     { sku: 'SKU1001', addedAt: '2023-10-25T10:00:00Z' },
     { sku: 'SKU1002', addedAt: '2023-10-26T14:30:00Z' },
-    { sku: 'SKU1003', addedAt: '2023-10-27T14:30:00Z' },
     { sku: 'SKU1004', addedAt: '2023-10-28T14:30:00Z' },
     { sku: 'SKU1005', addedAt: '2023-10-29T10:00:00Z' },
-    { sku: 'SKU1006', addedAt: '2023-10-29T11:00:00Z' },
     { sku: 'SKU1007', addedAt: '2023-10-29T12:00:00Z' },
-    { sku: 'SKU1008', addedAt: '2023-10-30T14:30:00Z' },
     { sku: 'SKU1009', addedAt: '2023-10-31T09:00:00Z' },
     { sku: 'SKU1010', addedAt: '2023-10-31T10:30:00Z' },
-    { sku: 'SKU1011', addedAt: '2023-11-01T14:30:00Z' },
     { sku: 'SKU1012', addedAt: '2023-11-02T16:00:00Z' }
   ]
 };
@@ -58,21 +54,7 @@ const catalog: any = {
     discountPercent: '50% OFF',
     category: 'Jeans',
     imageUrl: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['28', '30', '32'],
-    matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
-    reviewText: "Verified true to size by 40+ buyers",
-    subtitle: "Tap for Real-Body Photos & Insights >"
-  },
-  'SKU1003': {
-    sku: 'SKU1003',
-    name: 'Classic White Sneakers',
-    brand: 'Puma',
-    price: 2999,
-    originalPrice: 4999,
-    discountPercent: '40% OFF',
-    category: 'Shoes',
-    imageUrl: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['UK7', 'UK8', 'UK9'],
+    availableSizes: ['S', 'M', 'L', 'XL'],
     matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
     reviewText: "Verified true to size by 40+ buyers",
     subtitle: "Tap for Real-Body Photos & Insights >"
@@ -105,20 +87,6 @@ const catalog: any = {
     reviewText: "Verified true to size by 40+ buyers",
     subtitle: "Tap for Real-Body Photos & Insights >"
   },
-  'SKU1006': {
-    sku: 'SKU1006',
-    name: 'Gold Plated Hoop Earrings',
-    brand: 'Fida',
-    price: 499,
-    originalPrice: 999,
-    discountPercent: '50% OFF',
-    category: 'Accessories',
-    imageUrl: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['ONESIZE'],
-    matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
-    reviewText: "Verified true to size by 40+ buyers",
-    subtitle: "Tap for Real-Body Photos & Insights >"
-  },
   'SKU1007': {
     sku: 'SKU1007',
     name: 'Red A-Line Midi Dress',
@@ -129,20 +97,6 @@ const catalog: any = {
     category: 'Dresses',
     imageUrl: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=400',
     availableSizes: ['XS', 'S', 'M'],
-    matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
-    reviewText: "Verified true to size by 40+ buyers",
-    subtitle: "Tap for Real-Body Photos & Insights >"
-  },
-  'SKU1008': {
-    sku: 'SKU1008',
-    name: 'Black Stiletto Heels',
-    brand: 'DressBerry',
-    price: 2199,
-    originalPrice: 3999,
-    discountPercent: '45% OFF',
-    category: 'Shoes',
-    imageUrl: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['UK5', 'UK6', 'UK7'],
     matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
     reviewText: "Verified true to size by 40+ buyers",
     subtitle: "Tap for Real-Body Photos & Insights >"
@@ -175,20 +129,6 @@ const catalog: any = {
     reviewText: "Verified true to size by 40+ buyers",
     subtitle: "Tap for Real-Body Photos & Insights >"
   },
-  'SKU1011': {
-    sku: 'SKU1011',
-    name: 'Brown Leather Belt',
-    brand: 'Allen Solly',
-    price: 1199,
-    originalPrice: 1999,
-    discountPercent: '40% OFF',
-    category: 'Accessories',
-    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['32', '34', '36'],
-    matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
-    reviewText: "Verified true to size by 40+ buyers",
-    subtitle: "Tap for Real-Body Photos & Insights >"
-  },
   'SKU1012': {
     sku: 'SKU1012',
     name: 'Grey Skinny Fit Jeans',
@@ -198,7 +138,7 @@ const catalog: any = {
     discountPercent: '34% OFF',
     category: 'Jeans',
     imageUrl: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=400',
-    availableSizes: ['28', '30', '32', '34'],
+    availableSizes: ['S', 'M', 'L', 'XL'],
     matchScore: Math.floor(Math.random() * (99 - 70 + 1)) + 70,
     reviewText: "Verified true to size by 40+ buyers",
     subtitle: "Tap for Real-Body Photos & Insights >"
@@ -206,28 +146,82 @@ const catalog: any = {
 };
 
 const inventory: any = {
-  'SKU1001': { 'S': 10, 'M': 5, 'L': 0 }, // L is out of stock
-  'SKU1002': { '28': 2, '30': 15, '32': 8 },
-  'SKU1003': { 'UK7': 5, 'UK8': 10, 'UK9': 2 },
+  'SKU1001': { 'S': 10, 'M': 5, 'L': 0 },
+  'SKU1002': { 'S': 2, 'M': 15, 'L': 8, 'XL': 0 },
   'SKU1004': { 'M': 10, 'L': 5, 'XL': 0 },
   'SKU1005': { 'S': 5, 'M': 12, 'L': 20 },
-  'SKU1006': { 'ONESIZE': 50 },
   'SKU1007': { 'XS': 2, 'S': 5, 'M': 1 },
-  'SKU1008': { 'UK5': 0, 'UK6': 10, 'UK7': 5 },
   'SKU1009': { 'S': 8, 'M': 0, 'L': 4 },
   'SKU1010': { 'S': 15, 'M': 15, 'L': 15, 'XL': 15 },
-  'SKU1011': { '32': 5, '34': 5, '36': 0 },
-  'SKU1012': { '28': 12, '30': 4, '32': 0, '34': 6 }
+  'SKU1012': { 'S': 12, 'M': 4, 'L': 0, 'XL': 6 }
+};
+
+const userHistory: any = {
+  'user123': {
+    purchasedBrands: ['H&M', 'Roadster', 'Mango'],
+    successfulSizes: {
+      'Dresses': 'M',
+      'Jeans': 'M',
+      'Tops': 'M',
+      'Jackets': 'M'
+    }
+  }
+};
+
+const productSpecs: any = {
+  'SKU1001': { fitType: 'Regular', stretch: 'Stretchable', runs: 'Small' },
+  'SKU1002': { fitType: 'Relaxed', stretch: 'Non-stretch', runs: 'True' },
+  'SKU1004': { fitType: 'Slim', stretch: 'Non-stretch', runs: 'True' },
+  'SKU1005': { fitType: 'Fitted', stretch: 'Stretchable', runs: 'Small' },
+  'SKU1007': { fitType: 'Regular', stretch: 'Non-stretch', runs: 'Large' },
+  'SKU1009': { fitType: 'Oversized', stretch: 'Non-stretch', runs: 'True' },
+  'SKU1010': { fitType: 'Oversized', stretch: 'Stretchable', runs: 'True' },
+  'SKU1012': { fitType: 'Slim', stretch: 'Stretchable', runs: 'Small' }
+};
+
+const productReviews: any = {
+  'SKU1001': { volume: 45, consistency: 'High', consensus: 'Runs Small' },
+  'SKU1002': { volume: 8, consistency: 'Mixed', consensus: 'Mixed Sizing' },
+  'SKU1004': { volume: 2, consistency: 'Low', consensus: 'Unknown' },
+  'SKU1005': { volume: 120, consistency: 'High', consensus: 'Runs Small' },
+  'SKU1007': { volume: 25, consistency: 'High', consensus: 'Runs Large' },
+  'SKU1009': { volume: 80, consistency: 'High', consensus: 'True to Size' },
+  'SKU1010': { volume: 55, consistency: 'High', consensus: 'True to Size' },
+  'SKU1012': { volume: 12, consistency: 'Mixed', consensus: 'Runs Small' }
 };
 
 const ugcMedia: any = {
   'SKU1001': [
-    { id: '1', url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=200', username: '@stylebyananya' },
-    { id: '2', url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=200', username: '@fashionista99' }
+    { id: '1', url: 'https://images.unsplash.com/photo-1612336307429-8a898d10e223?auto=format&fit=crop&q=80&w=200', username: '@stylebyananya', size: 'S', comment: 'Fits really well!' },
+    { id: '2', url: 'https://images.unsplash.com/photo-1612336307429-8a898d10e223?auto=format&fit=crop&q=80&w=200', username: '@fashionista99', size: 'M', comment: 'Perfect summer dress!' }
   ],
   'SKU1002': [
-    { id: '3', url: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200', username: '@rahulstyles' },
-    { id: '4', url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=200', username: '@denimlover' }
+    { id: '3', url: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&q=80&w=200', username: '@rahulstyles', size: 'L', comment: 'Super comfy jeans' },
+    { id: '4', url: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&q=80&w=200', username: '@denimlover', size: 'XL', comment: 'Waist is a bit loose' }
+  ],
+  'SKU1004': [
+    { id: '5', url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=200', username: '@jacketguy', size: 'L', comment: 'Warm and stylish' },
+    { id: '6', url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=200', username: '@winterlooks', size: 'XL', comment: 'Sleeves are perfect' }
+  ],
+  'SKU1005': [
+    { id: '7', url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=200', username: '@casualstyle', size: 'S', comment: 'Soft material' },
+    { id: '8', url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=200', username: '@everydaywear', size: 'M', comment: 'A bit tight on shoulders' }
+  ],
+  'SKU1007': [
+    { id: '9', url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=200', username: '@dresslover', size: 'S', comment: 'Vibrant color' },
+    { id: '10', url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=200', username: '@partyvibes', size: 'M', comment: 'Fits perfectly' }
+  ],
+  'SKU1009': [
+    { id: '11', url: 'https://images.unsplash.com/photo-1601333144130-8cbb312386b6?auto=format&fit=crop&q=80&w=200', username: '@denimhead', size: 'M', comment: 'Classic look' },
+    { id: '12', url: 'https://images.unsplash.com/photo-1601333144130-8cbb312386b6?auto=format&fit=crop&q=80&w=200', username: '@vintagefan', size: 'L', comment: 'Sturdy fabric' }
+  ],
+  'SKU1010': [
+    { id: '13', url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', username: '@oversizedfan', size: 'L', comment: 'Very baggy' },
+    { id: '14', url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', username: '@chilldude', size: 'XL', comment: 'Comfortable' }
+  ],
+  'SKU1012': [
+    { id: '15', url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=200', username: '@skinnyjeans', size: 'S', comment: 'Very tight fit' },
+    { id: '16', url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=200', username: '@fashionboy', size: 'M', comment: 'Good stretch' }
   ]
 };
 
@@ -286,6 +280,18 @@ app.post('/internal/wishlist', (req, res) => {
   
   wishlists[userId].unshift({ sku, addedAt: new Date().toISOString() });
   res.json({ success: true, message: 'Added to wishlist' });
+});
+
+app.get('/internal/history/:userId', (req, res) => {
+  res.json(userHistory[req.params.userId] || { purchasedBrands: [], successfulSizes: {} });
+});
+
+app.get('/internal/specs/:sku', (req, res) => {
+  res.json(productSpecs[req.params.sku] || {});
+});
+
+app.get('/internal/reviews/:sku', (req, res) => {
+  res.json(productReviews[req.params.sku] || { volume: 0, consistency: 'Unknown', consensus: 'Unknown' });
 });
 
 export default app;

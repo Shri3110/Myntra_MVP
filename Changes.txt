@@ -1,0 +1,433 @@
+I need you to modify the EXISTING Myntra AI Fit & Decision Assistant MVP prototype.
+
+DO NOT redesign the entire application.
+DO NOT add new features outside the scope below.
+DO NOT change the overall Myntra-style visual design, navigation, product cards, or checkout flow.
+
+The goal is to make the current MVP accurately represent the product concept:
+
+“AI Fit & Decision Assistant”
+
+The core purpose is:
+Help users make a confident purchase decision on a product they have already saved, using evidence from their purchase history, product specifications, and relevant real-user reviews.
+
+IMPORTANT PRODUCT POSITIONING:
+
+This is NOT simply another size recommendation feature.
+
+Existing size recommendation answers:
+“What size should I choose?”
+
+Our AI Fit & Decision Assistant answers:
+“Why should I feel confident buying this?”
+
+The assistant should therefore provide:
+1. Fit confidence
+2. Evidence explaining that confidence
+3. Real-user product-specific evidence
+4. Sizing caveats
+5. Size selection
+6. Clear path to Move to Bag
+
+==================================================
+CHANGE 1 — REMOVE THE “86% MATCH” SCORE
+==================================================
+
+The current product card contains:
+
+“AI FIT ASSISTANT”
+“86% Match”
+
+REMOVE the percentage-based match score.
+
+Do NOT display:
+86% Match
+92% Match
+95% Fit
+or any other artificial percentage score.
+
+Replace it with:
+
+“FIT CONFIDENCE: HIGH”
+
+Use a clean, visually prominent badge.
+
+Underneath, show a short evidence-based explanation such as:
+
+“Runs slightly small — most reviewers recommend sizing up.”
+
+The purpose is to avoid creating false mathematical precision.
+
+Use three possible confidence states in the underlying design logic:
+
+HIGH
+MEDIUM
+INSUFFICIENT DATA
+
+For the current demo product, use:
+
+FIT CONFIDENCE: HIGH
+
+==================================================
+CHANGE 2 — CHANGE THE ORDER OF INFORMATION IN THE
+AI FIT & DECISION ASSISTANT
+==================================================
+
+Currently the assistant opens with:
+
+“Real-Body Try-On Gallery”
+
+This should NOT be the first thing users see.
+
+The assistant must answer the decision question first.
+
+Reorder the content to:
+
+1. FIT CONFIDENCE
+2. WHY WE THINK SO
+3. SIZING CAVEAT
+4. REAL-BODY EVIDENCE
+5. SIZING & FABRIC INSIGHTS
+6. SELECT SIZE
+7. MOVE TO BAG
+
+The user should understand the recommendation/confidence before scrolling through supporting evidence.
+
+==================================================
+CHANGE 3 — ADD A CLEAR FIT CONFIDENCE SECTION
+==================================================
+
+At the top of the AI Fit & Decision Assistant panel, create:
+
+FIT CONFIDENCE: HIGH
+
+Then:
+
+Why we think so:
+
+✓ Similar to your previous purchases
+✓ 14 relevant reviewers reported a good fit
+✓ Stretchable fabric reduces fit risk
+
+Keep the wording concise and visually scannable.
+
+IMPORTANT:
+Do not claim that the AI knows the user's exact body type unless actual structured body data exists.
+
+Do not use phrases such as:
+“Perfect for your body type”
+“Perfect fit for you”
+“Guaranteed to fit”
+
+The system should communicate confidence, not certainty.
+
+==================================================
+CHANGE 4 — ADD A CLEAR SIZING CAVEAT
+==================================================
+
+Immediately below the confidence explanation, show:
+
+SIZING CAVEAT
+
+⚠ Runs slightly small
+
+65% of reviewers who mentioned sizing recommend sizing up.
+
+Make this visually distinct from the confidence badge.
+
+The purpose is to show both:
+- why confidence is high
+- what uncertainty still exists
+
+==================================================
+CHANGE 5 — FIX THE REAL-BODY EVIDENCE SECTION
+==================================================
+
+The current gallery contains images that may not clearly represent the exact product.
+
+The MVP should NOT imply that generic fashion images are customer evidence.
+
+The Real-Body Evidence section must communicate that the images/reviews refer to the SAME PRODUCT.
+
+Rename:
+
+“Real-Body Try-On Gallery”
+
+to:
+
+“REAL-BODY EVIDENCE”
+
+or:
+
+“REAL-USER FIT EVIDENCE”
+
+For each review card, show:
+
+Reviewer name/handle
+Purchased size
+Short fit comment
+Customer photo
+
+Example:
+
+@stylebyananya
+
+Bought: M
+
+“Fits comfortably around the waist. Slightly fitted at the hips.”
+
+[customer photo]
+
+Second example:
+
+@fashionista99
+
+Bought: M
+
+“Comfortable fit. Fabric has some stretch.”
+
+[customer photo]
+
+IMPORTANT:
+Do not use generic model/fashion images and label them as real-user evidence.
+
+If actual product-specific customer images are not available in the current prototype data, use clearly labelled placeholder customer-review visuals rather than falsely implying that generic images are verified UGC.
+
+==================================================
+CHANGE 6 — FIX “14 SHOPPERS WITH SIMILAR BUILD”
+==================================================
+
+The current UI says:
+
+“14 shoppers with similar build loved the fit.”
+
+Change this because the current prototype does not establish structured body measurements for those shoppers.
+
+Use:
+
+“14 reviewers who bought this size reported a good fit.”
+
+OR:
+
+“14 reviewers reported a good fit for this size.”
+
+Use the first version if size information is available.
+
+DO NOT use:
+“similar build”
+“similar body type”
+“people like you”
+
+unless the underlying data actually contains structured body measurements that support this claim.
+
+==================================================
+CHANGE 7 — MAKE SIZE SELECTION CONSISTENT WITH THE EVIDENCE
+==================================================
+
+The current UI says:
+
+“Runs slightly small — 65% of buyers recommend sizing up.”
+
+But the user can then select S without the assistant helping them understand the implication.
+
+Improve the size selection section.
+
+Display:
+
+SELECT SIZE
+
+S    M    L    XL
+
+Show an AI-supported suggested size:
+
+RECOMMENDED: M
+
+“Based on your previous purchases and reviewer feedback.”
+
+The user must still be able to manually select any available size.
+
+Do NOT force the recommended size.
+
+The recommendation should be advisory, not mandatory.
+
+If the user selects a different size, allow them to proceed normally.
+
+==================================================
+CHANGE 8 — KEEP THE EXISTING MOVE TO BAG FLOW
+==================================================
+
+Keep:
+
+MOVE TO BAG
+
+Once a size is selected, the button should become active.
+
+Maintain the existing transition:
+
+Wishlist/Product
+→ AI Fit & Decision Assistant
+→ Select Size
+→ Move to Bag
+→ Bag/Checkout
+
+Do not introduce additional checkout steps.
+
+==================================================
+CHANGE 9 — MAKE THE ENTIRE ASSISTANT FEEL LIKE ONE
+DECISION CARD
+==================================================
+
+The experience should feel like one coherent decision-support module rather than several unrelated widgets.
+
+Recommended structure:
+
+--------------------------------
+AI FIT & DECISION ASSISTANT
+--------------------------------
+
+FIT CONFIDENCE: HIGH
+
+Why we think so:
+✓ Similar to your previous purchases
+✓ 14 reviewers reported a good fit
+✓ Stretchable fabric
+
+⚠ SIZING CAVEAT
+Runs slightly small
+65% of reviewers recommend sizing up
+
+REAL-BODY EVIDENCE
+
+[Review + product-specific customer photo]
+[Review + product-specific customer photo]
+
+SIZING & FABRIC INSIGHTS
+
+Fabric: 100% Cotton
+Stretch: Yes
+Fit: Slightly small
+
+SELECT SIZE
+
+S   M ✓   L   XL
+
+RECOMMENDED: M
+
+[ MOVE TO BAG ]
+--------------------------------
+
+Use good spacing and hierarchy so the user can scan this quickly.
+
+==================================================
+CHANGE 10 — ADD AN “INSUFFICIENT DATA” STATE
+==================================================
+
+Add logic/UI for cases where there is not enough evidence.
+
+Example:
+
+FIT CONFIDENCE: INSUFFICIENT DATA
+
+“We don't have enough relevant fit information to confidently assess this product.”
+
+Then show available evidence without pretending to have high confidence.
+
+Do NOT generate a high confidence score when there is insufficient evidence.
+
+This is important because the product has a False Confidence Risk.
+
+==================================================
+CHANGE 11 — FALSE CONFIDENCE SAFETY
+==================================================
+
+The assistant must never communicate certainty.
+
+Avoid:
+
+“Guaranteed fit”
+“Perfect fit”
+“Will definitely fit”
+“100% suitable”
+
+Use:
+
+“Fit Confidence: High”
+“Fit Confidence: Medium”
+“Insufficient data”
+
+Always provide the evidence behind the confidence level.
+
+==================================================
+CHANGE 12 — DO NOT ADD THESE FEATURES TO THE MVP
+==================================================
+
+Do NOT add or expand:
+
+- Styling recommendations
+- Outfit combinations
+- Wardrobe matching
+- Predictive stock alerts
+- Automatic substitutions
+- Alternative product recommendations
+- Price prediction
+- AI-generated virtual try-on
+- Complex body-shape classification
+- New recommendation engines
+
+These are OUT OF SCOPE for the MVP.
+
+They may be shown as Phase 2/Roadmap in the presentation, but must NOT appear as MVP functionality.
+
+==================================================
+DESIGN REQUIREMENTS
+==================================================
+
+Keep the existing Myntra-inspired visual language.
+
+Maintain:
+- Existing navigation
+- Existing product cards
+- Existing typography
+- Existing pink accent
+- Existing bottom navigation
+- Existing product/checkout flow
+
+Only modify the AI Fit & Decision Assistant experience and the minimum surrounding product-card teaser needed to support it.
+
+The assistant should feel like a native part of the shopping experience, not a separate chatbot.
+
+==================================================
+FINAL MVP USER JOURNEY
+==================================================
+
+The final prototype must communicate this journey:
+
+USER SAVES PRODUCT
+↓
+USER RETURNS TO PRODUCT
+↓
+FIT CONFIDENCE: HIGH
+↓
+WHY?
+↓
+REAL-USER EVIDENCE
+↓
+SIZING CAVEAT
+↓
+RECOMMENDED SIZE
+↓
+USER SELECTS SIZE
+↓
+MOVE TO BAG
+↓
+CHECKOUT
+
+The product's central promise is:
+
+“Give shoppers enough contextual evidence to confidently decide whether to buy a product they have already saved.”
+
+Do not change the core concept.
+
+Do not add unnecessary functionality.
+
+Prioritize clarity, evidence, trust, and decision confidence.

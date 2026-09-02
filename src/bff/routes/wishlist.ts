@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import redisClient from '../services/redis';
 import { aiBannerLatencyHistogram } from '../telemetry';
+import { calculateFitConfidence } from '../services/fitEngine';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.get('/:userId', async (req: Request, res: Response) => {
 
     // 2. Fetch AI Banner Data (Fit Score & Semantics) concurrently from Redis
     const enrichedItems = await Promise.all(items.map(async (item: any) => {
-      const cacheKey = `ai_banner:${userId}:${item.sku}`;
+      const cacheKey = `ai_banner_v2:${userId}:${item.sku}`;
       const cachedData = await redisClient.get(cacheKey);
 
       // Mock Feature Flag: Beta segment only for user IDs containing '123'
@@ -31,38 +32,39 @@ router.get('/:userId', async (req: Request, res: Response) => {
       if (cachedData) {
         aiBannerData = JSON.parse(cachedData);
       } else {
-        // Fallback: Trigger async generation via Python AI Engine
+        // Fallback: Calculate via Deterministic Fit Engine
         const endTimer = aiBannerLatencyHistogram.startTimer();
         try {
-          const fitScoreRes = await axios.post('http://127.0.0.1:8000/api/fit-score', {
-            userProfile: userProfile || { heightCm: 160, weightKg: 60, usualSize: 'M', bodyType: 'Average' },
-            product: { 
-              sku: item.sku, 
-              availableSizes: item.product.availableSizes || [],
-              category: item.product.category || 'Clothing'
-            }
-          });
-          const fitScore = fitScoreRes.data.fitScore;
-          
-          const summaryRes = await axios.post('http://127.0.0.1:8000/api/summarize-reviews', {
-            sku: item.sku,
-            reviews: item.reviews || ["Great fit!"]
-          });
-          
-          aiBannerData = {
-            fitScore: fitScoreRes.data.fitScore,
-            consensus: summaryRes.data.consensus,
-            isFallback: false
-          };
+          // Fetch required mock data for the engine
+          const [historyRes, specsRes, reviewsRes] = await Promise.all([
+            axios.get(`${getMockUrl()}/internal/history/${userId}`),
+            axios.get(`${getMockUrl()}/internal/specs/${item.sku}`),
+            axios.get(`${getMockUrl()}/internal/reviews/${item.sku}`)
+          ]);
+
+          const userHistory = historyRes.data;
+          const productSpecs = specsRes.data;
+          const productReviews = reviewsRes.data;
+
+          aiBannerData = calculateFitConfidence(
+            userProfile || { heightCm: 160, weightKg: 60, usualSize: 'M', bodyType: 'Average' },
+            userHistory,
+            item.product,
+            productSpecs,
+            productReviews
+          );
           
           // Asynchronously update Redis Cache
           redisClient.set(cacheKey, JSON.stringify(aiBannerData), { EX: 3600 });
           endTimer();
         } catch (e) {
-          console.error('Failed to contact AI Engine', e);
+          console.error('Failed to calculate Fit Confidence', e);
           aiBannerData = {
-            fitScore: null,
-            consensus: 'Generating fit insights...',
+            confidenceLevel: 'LOW',
+            caveatText: 'Unable to calculate sizing insights.',
+            reasons: ['Error calculating insights'],
+            recommendedSize: 'M',
+            recommendedSizeRationale: 'Fallback size',
             isFallback: true
           };
           endTimer();
@@ -83,6 +85,48 @@ router.get('/:userId', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching wishlist', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+router.post('/banner/:userId', async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { item } = req.body; // { sku, product }
+  
+  try {
+    const cacheKey = `ai_banner_v2:${userId}:${item.sku}`;
+    const cachedData = await redisClient.get(cacheKey);
+
+    if (cachedData) {
+      return res.json(JSON.parse(cachedData));
+    }
+
+    const [historyRes, specsRes, reviewsRes] = await Promise.all([
+      axios.get(`${getMockUrl()}/internal/history/${userId}`),
+      axios.get(`${getMockUrl()}/internal/specs/${item.sku}`),
+      axios.get(`${getMockUrl()}/internal/reviews/${item.sku}`)
+    ]);
+
+    const userProfile = { heightCm: 160, weightKg: 60, usualSize: 'M', bodyType: 'Average' };
+    const aiBannerData = calculateFitConfidence(
+      userProfile,
+      historyRes.data,
+      item.product || item,
+      specsRes.data,
+      reviewsRes.data
+    );
+    
+    redisClient.set(cacheKey, JSON.stringify(aiBannerData), { EX: 3600 });
+    res.json(aiBannerData);
+  } catch (error) {
+    console.error('Error calculating banner', error);
+    res.json({
+      confidenceLevel: 'LOW',
+      caveatText: 'Unable to calculate sizing insights.',
+      reasons: ['Error calculating insights'],
+      recommendedSize: 'M',
+      recommendedSizeRationale: 'Fallback size',
+      isFallback: true
+    });
   }
 });
 

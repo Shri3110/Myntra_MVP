@@ -59,19 +59,26 @@ export default function RootLayout() {
             {/* Search and Utilities Row */}
             <View style={styles.searchRow}>
               {/* Search Bar */}
-              <View style={styles.searchBar}>
+              <TouchableOpacity 
+                style={styles.searchBar}
+                activeOpacity={1}
+                onPress={() => showToast('Search bar is intentionally disabled for this MVP')}
+                {...(Platform.OS === 'web' ? { title: 'Search bar is intentionally disabled for this MVP' } as any : {})}
+              >
                 <Text style={styles.myntraLogo}>M</Text>
-                <TextInput 
-                  style={styles.searchInput}
-                  placeholder='"Pants"'
-                  placeholderTextColor="#7e818c"
-                  editable={false}
-                />
+                <View pointerEvents="none" style={{flex: 1}}>
+                  <TextInput 
+                    style={styles.searchInput}
+                    placeholder='Search'
+                    placeholderTextColor="#7e818c"
+                    editable={false}
+                  />
+                </View>
                 <View style={styles.searchIcons}>
                   <Text style={styles.iconSm}>🎤</Text>
                   <Text style={styles.iconSm}>📷</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               
               {/* Utilities */}
               <View style={styles.utilities}>
